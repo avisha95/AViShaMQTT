@@ -1,0 +1,22 @@
+#######################################
+# Syntax Coloring Map For AViShaMQTT
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+AViShaMQTT	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+getIncomingMessage KEYWORD2
+setIncomingMessage KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+# CONSTANT	LITERAL1
