@@ -7,11 +7,11 @@ This is the doc for how to subscribe an MQTT Broker.
 ## Table of Content
 1. Instance an MQTT Obj
 2. subscribe into an topic
-3. get the freshest message.
+3. get the latest message.
 4. Full example
 
 ## 1. Instance an MQTT Object
-You want to Instanciate an Object from class AViShaMQTT.
+You need to instantiate an MQTT object from class AViShaMQTT.
 
 Use the same code as in chapter 1 from `01-publish.md`.
 
@@ -34,7 +34,7 @@ Where:
 > For more information read `01-publish` Constructor.
 
 ## 2. Subscribe a topic
-Use the method `subscribe`, which will subscribe a topic you sellected.
+Use the method `subscribe`, which will subscribe to a topic you selected.
 
 ```cpp
 mqtt.subscribe("your/topic/here", 1);
@@ -43,9 +43,9 @@ mqtt.subscribe("your/topic/here", 1);
 > [!Notice]
 > The 1 is here because it is the priority of the topics.
 >
-> That means that you can subscribe more then 1!
+> That means that you can subscribe more than one!
 
-## 3. Get The Freshest Message
+## 3. Get The latest Message
 To get the freshest message use `getIncomingMessage`.
 
 ```cpp
@@ -57,7 +57,7 @@ String message = mqtt.getIncomingMessage();
 
 // demo code, code could be broken
 // Copyright (C) 2026 seesee010
-// this snippset is under CC0 License
+// this snippet is under CC0 License
 
 #include <AViShaMQTT.h>
 
@@ -71,7 +71,7 @@ const char* mqtt_user = "user123";
 const char* mqtt_pass = "12345";
 
 // instiate object
-AViShaMQTT mqtt(ssid, password, mqtt_server, mqtt_port, mqtt_user, my_user_pass);
+AViShaMQTT mqtt(ssid, password, mqtt_server, mqtt_port, mqtt_user, mqtt_pass);
 
 String message;
 

@@ -98,7 +98,7 @@ myMQTT.publish("this/is/my/topic/pressure", String(5));
 
 // demo code, code could be broken
 // Copyright (C) 2026 seesee010
-// this snippset is under CC0 License
+// this snippet is under CC0 License
 
 #include <AViShaMQTT.h>
 
