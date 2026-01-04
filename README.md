@@ -3,10 +3,10 @@
 AViShaMQTT is a small wrapper library that simplifies the usage of the
 `MQTT.h` library by Joël Gähwiler on ESP8266 and ESP32 devices.
 
-⚠️ **Note:**  
-This repository is a **documentation-focused fork** of the original project by
-Ajang Rahmat.  
-The code itself is largely unchanged; the goal of this fork is improved
+> [!Note]  
+> This repository is a **documentation-focused fork** of the original project by
+> Ajang Rahmat.  
+> The code itself is largely unchanged; the goal of this fork is improved 
 documentation and clarity.
 
 Original project:
