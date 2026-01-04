@@ -93,9 +93,6 @@ As following:
 myMQTT.publish("this/is/my/topic/pressure", String(5));
 ```
 
-> [!Important]
-> Copyright (C) 2026 seesee010. This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**, same as the AViShaMQTT code.
-
 ## Full example
 ```ino
 
@@ -127,3 +124,6 @@ void loop() {
     mqtt.publish("helloWorld/topic/0123/temp", String(5));
 }
 ```
+
+> [!Important]
+> Copyright (C) 2026 seesee010. This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**, same as the AViShaMQTT code.
