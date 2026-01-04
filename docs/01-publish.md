@@ -108,8 +108,8 @@ const char* mqtt_server = "broker.emqx.io";
 
 const int mqtt_port = 1883;
 
-const char mqtt_user = "user123";
-const char mqtt_pass = "12345";
+const char* mqtt_user = "user123";
+const char* mqtt_pass = "12345";
 
 // instiate object
 AViShaMQTT mqtt(ssid, password, mqtt_server, mqtt_port, mqtt_user, my_user_pass);
