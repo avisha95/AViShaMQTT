@@ -1,15 +1,3 @@
-/*
- * AViShaMQTT
- *
- * Original work:
- * Copyright (c) Ajang Rahmat
- *
- * Modifications and documentation:
- * Copyright (c) 2026 seesee010
- *
- * License: GNU General Public License v3.0 or later
- */
-
 #include "AViShaMQTT.h"
 
 AViShaMQTT::AViShaMQTT(const char* ssid, const char* password, const char* mqtt_server,
