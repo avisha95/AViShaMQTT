@@ -1,27 +1,52 @@
 # AViShaMQTT
 
-AViShaMQTT adalah library yang menyederhanakan penggunaan dari library `MQTT.h`. Oleh karena itu, Anda harus menginstal library `MQTT.h` terlebih dahulu. Anda dapat mengunduhnya dari [arduino-mqtt](https://github.com/256dpi/arduino-mqtt).
+AViShaMQTT is a small wrapper library that simplifies the usage of the
+`MQTT.h` library by Joël Gähwiler on ESP8266 and ESP32 devices.
 
-**Version:** 1.0.0  
-**Author:** Ajang Rahmat  
-**Maintainer:** Ajang Rahmat <ajangrahmat@gmail.com>  
-**Category:** Communication  
-**URL:** [AViShaMQTT GitHub Repository](https://github.com/AViShaMQTT)  
-**Architectures:** ESP8266/ESP32  
-**Includes:** AViShaMQTT.h  
+> [!Note]  
+> This repository is a **documentation-focused fork** of the original project by
+> Ajang Rahmat.  
+> The code itself is largely unchanged; the goal of this fork is improved 
+documentation and clarity.
 
-### Deskripsi Singkat
+Original project:
+https://github.com/avisha95/AViShaMQTT
 
-Library ini memungkinkan perangkat ESP untuk berkomunikasi menggunakan protokol MQTT.
+---
 
-### Deskripsi Lengkap
+## Requirements
 
-AViShaMQTT adalah library yang dirancang untuk mempermudah perangkat ESP8266 dan ESP32 dalam menggunakan protokol MQTT. Library ini mendukung fitur-fitur MQTT seperti publish dan subscribe, Retain, QoS, dan lainnya. Dengan menggunakan library ini, pengembang dapat dengan mudah mengintegrasikan perangkat IoT mereka dengan berbagai broker MQTT.
+This library depends on the following external library:
 
-### Fitur
+- **MQTT** by Joël Gähwiler  
+  https://github.com/256dpi/arduino-mqtt
 
-- **Publish dan Subscribe:** Kirim dan terima pesan melalui topik MQTT.
-- **Retain:** Menyimpan pesan terakhir pada topik tertentu.
-- **QoS (Quality of Service):** Menyediakan level jaminan pengiriman pesan.
-- **Kompatibilitas dengan MQTT5:** Mendukung versi terbaru dari protokol MQTT.
-- **Kemudahan Integrasi:** Mudah digunakan dan diintegrasikan dengan perangkat IoT berbasis ESP.
+You must install it before using AViShaMQTT.
+
+
+## Supported Platforms
+
+- ESP8266
+- ESP32
+
+
+## Description
+
+AViShaMQTT simplifies common MQTT tasks such as connecting to a broker,
+publishing messages, and subscribing to topics on ESP-based devices.
+It acts as a thin abstraction layer on top of `MQTT.h`.
+
+
+## Features
+
+- Publish and subscribe to MQTT topics
+- Retained messages
+- QoS support (depending on underlying MQTT library)
+
+## License
+
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.
+
+
+Original Author: Ajang Rahmat  
+Documentation & maintenance improvements: seesee010
