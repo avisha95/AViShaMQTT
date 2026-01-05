@@ -1,15 +1,3 @@
-/*
- * AViShaMQTT
- *
- * Original work:
- * Copyright (c) Ajang Rahmat
- *
- * Modifications and documentation:
- * Copyright (c) 2026 seesee010
- *
- * License: GNU General Public License v3.0 or later
- */
-
 #ifndef AViShaMQTT_h
 #define AViShaMQTT_h
 
