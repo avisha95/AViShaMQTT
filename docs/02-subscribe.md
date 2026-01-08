@@ -1,7 +1,7 @@
 # 02-Subscribe
 This is the doc for how to subscribe an MQTT Broker.
 
-> [!Info]
+> [!NOTE]
 > Before you want to read this, read at least a little bit of `01-publish.md`, because there are all the basics this doc will set as basics.
 
 ## Table of Content
@@ -30,7 +30,7 @@ Where:
 - mqtt_user_name: The broker gave you an username
 - user_pass: The broker gave you an password
 
-> [!Info]
+> [!NOTE]
 > For more information read `01-publish` Constructor.
 
 ## 2. Subscribe a topic
@@ -40,7 +40,7 @@ Use the method `subscribe`, which will subscribe to a topic you selected.
 mqtt.subscribe("your/topic/here", 1);
 ```
 
-> [!Notice]
+> [!NOTE]
 > The 1 is here because it is the priority of the topics.
 >
 > That means that you can subscribe more than one!

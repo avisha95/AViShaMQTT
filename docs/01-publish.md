@@ -78,7 +78,7 @@ Therefore you might want:
 String(5); // convert 5 into string
 ```
 
-> [!Info]
+> [!NOTE]
 > Do **NOT** separate the String or use in any way spaces or special characters!
 
 ### Publish Data into a topic
