@@ -30,7 +30,7 @@ Where:
 - mqtt_user_name: The broker gave you an username
 - user_pass: The broker gave you an password
 
-> [!Info]
+> [!NOTE]
 > For more information read `01-publish` Constructor.
 
 ## 2. Subscribe a topic
