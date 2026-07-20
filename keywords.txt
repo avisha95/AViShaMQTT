@@ -1,0 +1,44 @@
+#######################################
+# Syntax Coloring Map For AViShaMQTT
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+AViShaMQTT	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+loop	KEYWORD2
+isConnected	KEYWORD2
+state	KEYWORD2
+publish	KEYWORD2
+subscribe	KEYWORD2
+unsubscribe	KEYWORD2
+getIncomingTopic	KEYWORD2
+getIncomingMessage	KEYWORD2
+setIncomingTopic	KEYWORD2
+setIncomingMessage	KEYWORD2
+setWill	KEYWORD2
+clearWill	KEYWORD2
+setKeepAlive	KEYWORD2
+disconnect	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+MQTT_CONNECTION_TIMEOUT	LITERAL1
+MQTT_CONNECTION_LOST	LITERAL1
+MQTT_CONNECT_FAILED	LITERAL1
+MQTT_DISCONNECTED	LITERAL1
+MQTT_CONNECTED	LITERAL1
+MQTT_CONNECT_BAD_PROTOCOL	LITERAL1
+MQTT_CONNECT_BAD_CLIENT_ID	LITERAL1
+MQTT_CONNECT_UNAVAILABLE	LITERAL1
+MQTT_CONNECT_BAD_CREDENTIALS	LITERAL1
+MQTT_CONNECT_UNAUTHORIZED	LITERAL1
