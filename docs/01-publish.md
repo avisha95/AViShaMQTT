@@ -1,129 +1,147 @@
-# 01-Publish
-This is a doc to make clear what you can achieve by using this lib.
+---
+title: 01 — Publishing Data
+description: Learn how to connect to WiFi/MQTT and publish data to a broker
+nav_order: 1
+---
 
-In this lib you will learn to publish data into a broker and get data from an broker.
+# 01 — Publishing Data
 
-This doc will focus on how to send data to an broker.
+This tutorial covers how to publish sensor data to an MQTT broker using AViShaMQTT.
 
-## Table of content
-1. First obj
-2. begin()
-3. loop()
-4. publish()
+## Table of Contents
 
-5. full example
+1. [Create the Object](#create-the-object)
+2. [begin() — Connect WiFi + MQTT](#begin--connect-wifi--mqtt)
+3. [loop() — Keep Alive](#loop--keep-alive)
+4. [publish() — Send Data](#publish--send-data)
+5. [Full Example](#full-example)
 
-## First Object
-First you need to instantiate an obj from class "AViShaMQTT".
+---
 
-AViShaMQTT's Constructor requires:
-- ssid: Your WiFi Name
-- ssid_password: Your WiFi password
-- mqtt_server: The IP or the url of the MQTT Broker
-- mqtt_port: the port of the server. (Mostly used: 1883)
+## Create the Object
 
-- mqtt_user: The broker gave you an username
-- mqtt_pass: The broker gave you an password
-
-As example:
-```cpp
-AViShaMQTT myMQTT(wifi_name, wifi_password, 192.168.2.55, 1883, my_user, my_user_password);
-```
-
-## Begin()
-Then you want to use the method "begin" of the object.
+Create an instance of `AViShaMQTT` with your credentials:
 
 ```cpp
-myMQTT.begin();
+AViShaMQTT myMQTT(wifi_name, wifi_password, "broker.emqx.io", 1883);
 ```
 
-> Which will connect to WiFi and connect to MQTT!
+The constructor requires:
+- **ssid** — Your WiFi network name
+- **password** — Your WiFi password
+- **mqtt_server** — Broker IP or hostname
+- **mqtt_port** — Broker port (default: 1883)
+- **mqtt_user** *(optional)* — Username for authentication
+- **mqtt_pass** *(optional)* — Password for authentication
 
-## Loop()
+> **Note:** For brokers requiring authentication, see the `MQTT_With_Authentication` example.
 
-> [!Important]
-> Call loop() at least every ~15 s to maintain connection.
+---
+
+## begin() — Connect WiFi + MQTT
+
+Call `begin()` once in `setup()`. It handles both WiFi and MQTT connection with a 15-second timeout:
 
 ```cpp
-myMQTT.loop();
+void setup() {
+  if (!myMQTT.begin()) {
+    Serial.print("Failed! State: ");
+    Serial.println(myMQTT.state());
+    while (1); // halt on failure
+  }
+}
 ```
 
-## Publish()
-To send data you must have:
-- In which `Topic`
-- Data
+`begin()` returns `false` on failure. Check `state()` for the error code.
 
-### The Topic
-A topic is a digital place where you want to send your data to. 
+---
 
-For example you come up with the name:
-"myHome/inDoor/livingroom/0/temp"
+## loop() — Keep Alive
 
-and every new sensor will be a new place.
-
-For example a sensor, which gets pressure data.
-
-Therefore you might want:
-"myHome/inDoor/livingroom/0/pres"
-
-> [!NOTE]
-> "0" is here just a number, which increments from 0 in this example.
-
-### Data
-
-> [!Important]
-> Your data must be transformed into a String();
+Call `loop()` in the main loop to maintain the connection. It auto-reconnects WiFi and MQTT if disconnected:
 
 ```cpp
-String(5); // convert 5 into string
+void loop() {
+  myMQTT.loop();
+  // your code here
+}
 ```
 
-> [!Info]
-> Do **NOT** separate the String or use in any way spaces or special characters!
+> **Important:** Call `loop()` at least every ~15 seconds to maintain the connection.
 
-### Publish Data into a topic
-To send data, use the `publish` method.
+---
 
-It requires:
-- Topic
-- Data
+## publish() — Send Data
 
-As following:
+Use `publish()` to send data to a topic:
+
 ```cpp
-myMQTT.publish("this/is/my/topic/pressure", String(5));
+myMQTT.publish("myHome/livingroom/temp", String(25.5));
 ```
 
-## Full example
-```ino
+**Choosing a topic:**
 
-// demo code, code could be broken
-// Copyright (C) 2026 seesee010
-// this snippet is under CC0 License
+Topics are hierarchical paths. For example:
 
+```
+myHome/livingroom/0/temp   ← temperature sensor 0
+myHome/livingroom/0/pres   ← pressure sensor 0
+myHome/livingroom/1/temp   ← temperature sensor 1
+```
+
+**Publish overloads:**
+
+```cpp
+mqtt.publish("topic", "payload");                          // QoS 0
+mqtt.publish("topic", "payload", true, 1);                 // Retain + QoS 1
+mqtt.publish("topic", buffer, length, false, 2);           // Binary + QoS 2
+```
+
+**Streaming publish (large payloads):**
+
+```cpp
+mqtt.beginPublish("topic/json", totalSize, false, 1);
+mqtt.write(chunk1, size1);
+mqtt.write(chunk2, size2);
+mqtt.endPublish();
+```
+
+---
+
+## Full Example
+
+```cpp
 #include <AViShaMQTT.h>
 
-const char* ssid = "isi dengan nama wifi";
-const char* password = "isi dengan password wifi";
+const char* ssid = "your wifi";
+const char* password = "your wifi password";
 const char* mqtt_server = "broker.emqx.io";
 
-const int mqtt_port = 1883;
+AViShaMQTT mqtt(ssid, password, mqtt_server);
 
-const char* mqtt_user = "user123";
-const char* mqtt_pass = "12345";
-
-// instiate object
-AViShaMQTT mqtt(ssid, password, mqtt_server, mqtt_port, mqtt_user, my_user_pass);
+unsigned long timer = 0;
+int counter = 0;
 
 void setup() {
-    mqtt.begin();
+  Serial.begin(115200);
+
+  if (!mqtt.begin()) {
+    Serial.print("Failed, state: ");
+    Serial.println(mqtt.state());
+    while (1);
+  }
 }
 
 void loop() {
-    mqtt.loop();
+  mqtt.loop();
 
-    mqtt.publish("helloWorld/topic/0123/temp", String(5));
+  if (millis() - timer >= 1000) {
+    timer = millis();
+    mqtt.publish("hello/topic/sensor", String(++counter));
+  }
 }
 ```
 
-> [!Important]
-> Copyright (C) 2026 seesee010. This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**, same as the AViShaMQTT code.
+---
+
+[← Back to Home](.) | [Next: 02 — Subscribing →](02-subscribe)

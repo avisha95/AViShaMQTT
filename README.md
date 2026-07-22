@@ -1,90 +1,62 @@
-# AViShaMQTT — MQTT Library for ESP32 and ESP8266
+# AViShaMQTT — Arduino MQTT Library for ESP32 & ESP8266 IoT
 
-A simple and robust MQTT library for ESP32 and ESP8266 with auto-reconnect, state tracking, QoS 0/1/2, TLS support, and Last Will. Built on [arduino-mqtt](https://github.com/256dpi/arduino-mqtt) by Joël Gähwiler — **bundled, no extra dependencies**.
+A simple and robust **Arduino MQTT library for ESP32 and ESP8266** that combines the best of both worlds: **[arduino-mqtt](https://github.com/256dpi/arduino-mqtt)** (QoS 2, Retain, Will, Persistent Session) + **[PubSubClient](https://github.com/knolleary/pubsubclient)** (streaming publish, customizable buffer) — plus auto-reconnect, state tracking, and TLS support. **Bundled, no extra dependencies.**
 
-**Version:** 1.1.0  
-**Author:** Ajang Rahmat  
-**Maintainer:** Ajang Rahmat <ajangrahmat@gmail.com>  
-**Category:** Communication  
-**URL:** [GitHub — avisha95/AViShaMQTT](https://github.com/avisha95/AViShaMQTT)  
-**Architectures:** ESP8266, ESP32  
-**Includes:** AViShaMQTT.h  
+## Table of Contents
 
-### Installation
+- [Why AViShaMQTT?](#why-avishamqtt)
+- [Comparison](#comparison-avishamqtt-vs-arduino-mqtt-vs-pubsubclient)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [API Reference](#api-reference)
+- [Connection States](#connection-states)
+- [Examples](#examples)
+- [Troubleshooting](#troubleshooting)
+- [Credits](#credits)
 
-#### Arduino IDE
+## Why AViShaMQTT?
 
-1. Download this repo as ZIP (`Code` → `Download ZIP`)
-2. In Arduino IDE: `Sketch` → `Include Library` → `Add .ZIP Library...`
-3. Select the downloaded ZIP file
+AViShaMQTT combines the advanced MQTT protocol features from **arduino-mqtt** with the ease-of-use patterns from **PubSubClient** into a single Arduino IoT library. It supports all standard MQTT features — publish, subscribe, Retain, QoS 0/1/2, Last Will, Persistent Session — plus streaming publish for large payloads, customizable buffer size, automatic WiFi + MQTT reconnection, subscription restore, and PubSubClient-compatible state codes.
 
-Or manually copy the `AViShaMQTT` folder to `Arduino/libraries/`.
+No need to choose between libraries anymore. Get full MQTT 3.1.1 compliance with zero boilerplate.
 
-#### PlatformIO
+## Comparison: AViShaMQTT vs arduino-mqtt vs PubSubClient
 
-**Via `platformio.ini`:**
+| Feature | PubSubClient | arduino-mqtt | AViShaMQTT |
+|---------|:---:|:---:|:---:|
+| QoS 0 / 1 / 2 | 0 / 1 / — | 0 / 1 / 2 | 0 / 1 / 2 |
+| Retain messages | — | ✓ | ✓ |
+| Last Will & Testament | — | ✓ | ✓ |
+| Persistent session | — | ✓ | ✓ |
+| Streaming publish (chunked) | ✓ | — | ✓ |
+| Custom buffer size | ✓ | — | ✓ |
+| Auto-reconnect WiFi + MQTT | — | — | ✓ |
+| Subscription restore | — | — | ✓ |
+| PubSubClient-compatible states | ✓ | — | ✓ |
+| TLS support | Manual | Manual | Constructor param |
+| Platforms | All Arduino | All Arduino | ESP8266, ESP32 |
 
-```ini
-lib_deps =
-    https://github.com/avisha95/AViShaMQTT
-```
+## Features
 
-Or if registered in the registry:
+- **Publish & Subscribe** — Send and receive messages via MQTT topics
+- **Streaming Publish** — Publish large payloads in chunks with `beginPublish()` / `write()` / `endPublish()`
+- **Custom Buffer Size** — Configure MQTT packet buffer via constructor parameter
+- **Binary Publish** — Publish binary payloads (`uint8_t*`, length)
+- **Retain** — Store the last message on a topic
+- **QoS 0, 1, 2** — Full Quality of Service support
+- **Unsubscribe** — Stop subscribing to a topic
+- **Disconnect** — Manually disconnect from the broker
+- **Last Will & Testament** — Set a will message for device disconnect notification
+- **Persistent Session** — Resume sessions after disconnect with `setCleanSession(false)`
+- **Keep Alive** — Configurable keep alive interval
+- **State Info** — Get connection error codes via `state()` (PubSubClient compatible)
+- **Auto-Reconnect** — Automatic WiFi and MQTT reconnection in `loop()`
+- **Non-blocking Connect** — `begin()` returns `false` on failure with 15s timeout
+- **Custom Client** — Use any `Client` subclass (WiFiClientSecure, EthernetClient, etc.)
+- **MQTT 3.1.1** — Built on [arduino-mqtt](https://github.com/256dpi/arduino-mqtt)
 
-```ini
-lib_deps =
-    avisha95/AViShaMQTT@^1.1.0
-```
-
-**Via CLI:**
-
-```bash
-pio pkg install --library "avisha95/AViShaMQTT@^1.1.0"
-```
-
-> **Note:** arduino-mqtt is already bundled inside AViShaMQTT — no extra dependencies needed.
-
-### Credits
-
-AViShaMQTT uses [arduino-mqtt](https://github.com/256dpi/arduino-mqtt) (MIT License) by Joël Gähwiler as the MQTT backend. See `LICENSE-mqtt.md` for license information.
-
-### Description
-
-AViShaMQTT is designed to make it easy for ESP8266 and ESP32 devices to use the MQTT protocol. It supports MQTT features like publish, subscribe, Retain, QoS, and more. Developers can quickly integrate their IoT devices with any MQTT broker.
-
-### Features
-
-- **Publish & Subscribe:** Send and receive messages via MQTT topics.
-- **Binary Publish:** Publish binary payloads (`uint8_t*`, length).
-- **Retain:** Store the last message on a topic.
-- **QoS (Quality of Service):** QoS 0, 1, 2.
-- **Unsubscribe:** Stop subscribing to a topic.
-- **Disconnect:** Manually disconnect from the broker.
-- **Last Will & Testament:** Set a will message for device disconnect notification.
-- **Keep Alive:** Configurable keep alive interval.
-- **State Info:** Get connection error codes via `state()` (PubSubClient compatible).
-- **Auto-Reconnect:** Automatic WiFi and MQTT reconnection in `loop()`.
-- **Non-blocking Connect:** `begin()` returns `false` on failure (with timeout).
-- **Custom Client Support:** Use any `Client` subclass (WiFiClientSecure, EthernetClient, etc.).
-- **MQTT 3.1.1:** Uses [arduino-mqtt](https://github.com/256dpi/arduino-mqtt) as the backend.
-- **Easy Integration:** Simple API for IoT devices.
-
-### Connection States
-
-| Code | Constant | Description |
-|------|----------|-------------|
-| -4 | `MQTT_CONNECTION_TIMEOUT` | Connection timed out |
-| -3 | `MQTT_CONNECTION_LOST` | Connection lost |
-| -2 | `MQTT_CONNECT_FAILED` | Connection failed |
-| -1 | `MQTT_DISCONNECTED` | Disconnected |
-| 0 | `MQTT_CONNECTED` | Connected |
-| 1 | `MQTT_CONNECT_BAD_PROTOCOL` | Bad protocol version |
-| 2 | `MQTT_CONNECT_BAD_CLIENT_ID` | Client ID rejected |
-| 3 | `MQTT_CONNECT_UNAVAILABLE` | Server unavailable |
-| 4 | `MQTT_CONNECT_BAD_CREDENTIALS` | Bad username/password |
-| 5 | `MQTT_CONNECT_UNAUTHORIZED` | Not authorized |
-
-### Quick Example
+## Quick Start
 
 ```cpp
 #include <AViShaMQTT.h>
@@ -118,34 +90,78 @@ void loop() {
 }
 ```
 
-### API Reference
+## Installation
 
-#### Constructor
+### Arduino IDE
 
-```cpp
-AViShaMQTT(ssid, password, mqtt_server, mqtt_port = 1883, mqtt_user = nullptr, mqtt_pass = nullptr);
-AViShaMQTT(ssid, password, mqtt_server, mqtt_port, Client& net, mqtt_user = nullptr, mqtt_pass = nullptr);
+1. Download this repo as ZIP (`Code` → `Download ZIP`)
+2. In Arduino IDE: `Sketch` → `Include Library` → `Add .ZIP Library...`
+3. Select the downloaded ZIP file
+
+Or manually copy the `AViShaMQTT` folder to `Arduino/libraries/`.
+
+### PlatformIO
+
+**Via `platformio.ini`:**
+
+```ini
+lib_deps =
+    https://github.com/avisha95/AViShaMQTT
 ```
 
-#### Lifecycle
+Or if registered in the registry:
+
+```ini
+lib_deps =
+    avisha95/AViShaMQTT@^1.2.0
+```
+
+**Via CLI:**
+
+```bash
+pio pkg install --library "avisha95/AViShaMQTT@^1.2.0"
+```
+
+> **Note:** arduino-mqtt is already bundled inside AViShaMQTT — no extra dependencies needed.
+
+## API Reference
+
+### Constructor
+
+```cpp
+// Default — uses internal WiFiClient, default 128 byte buffer
+AViShaMQTT(ssid, password, server, port = 1883, user = nullptr, pass = nullptr, bufferSize = 128);
+
+// Custom Client — for TLS (WiFiClientSecure), Ethernet, etc.
+AViShaMQTT(ssid, password, server, port, Client& net, user = nullptr, pass = nullptr, bufferSize = 128);
+
+// Large buffer example — for JSON payloads
+AViShaMQTT mqtt(ssid, password, server, 1883, nullptr, nullptr, 512);
+```
+
+### Lifecycle
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `begin()` | `bool` | Connect WiFi + MQTT with 15s timeout. Returns `false` on failure |
-| `loop()` | `void` | Call in `loop()`. Handles WiFi/MQTT reconnect + message processing |
+| `begin()` | `bool` | Connect WiFi + MQTT with 15s timeout |
+| `loop()` | `void` | Call in `loop()`. Handles reconnect + message processing |
 | `isConnected()` | `bool` | Check if MQTT is connected |
 | `state()` | `int` | Get connection state code (-4 to 5) |
 | `disconnect()` | `void` | Disconnect from MQTT broker |
 
-#### Publish
+### Publish
 
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `publish(topic, payload)` | `bool` | Publish string payload |
 | `publish(topic, payload, retained, qos)` | `bool` | Publish with retain flag and QoS |
 | `publish(topic, payload, length, retained, qos)` | `bool` | Publish binary payload (`uint8_t*`) |
+| `beginPublish(topic, size, retained, qos)` | `bool` | Start streaming publish |
+| `write(buf, size)` | `size_t` | Write chunk to stream buffer |
+| `write(byte)` | `size_t` | Write single byte to stream buffer |
+| `endPublish()` | `bool` | Finish streaming publish and send |
 
-#### Subscribe
+### Subscribe
 
 | Method | Returns | Description |
 |--------|---------|-------------|
@@ -153,7 +169,7 @@ AViShaMQTT(ssid, password, mqtt_server, mqtt_port, Client& net, mqtt_user = null
 | `subscribe(topic, qos)` | `bool` | Subscribe with QoS level |
 | `unsubscribe(topic)` | `bool` | Unsubscribe from topic |
 
-#### Incoming Messages
+### Incoming Messages
 
 | Method | Returns | Description |
 |--------|---------|-------------|
@@ -162,15 +178,31 @@ AViShaMQTT(ssid, password, mqtt_server, mqtt_port, Client& net, mqtt_user = null
 | `setIncomingTopic(topic)` | `void` | Clear/override incoming topic |
 | `setIncomingMessage(msg)` | `void` | Clear/override incoming message |
 
-#### Configuration
+### Configuration
 
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `setWill(topic, payload, retained, qos)` | `void` | Set Last Will message (call before `begin()`) |
 | `clearWill()` | `void` | Clear Last Will |
 | `setKeepAlive(seconds)` | `void` | Set MQTT keep alive interval |
+| `setCleanSession(clean)` | `void` | Enable (`true`) or disable (`false`) persistent session |
 
-### Examples
+## Connection States
+
+| Code | Constant | Description |
+|------|----------|-------------|
+| -4 | `MQTT_CONNECTION_TIMEOUT` | Connection timed out |
+| -3 | `MQTT_CONNECTION_LOST` | Connection lost |
+| -2 | `MQTT_CONNECT_FAILED` | Connection failed |
+| -1 | `MQTT_DISCONNECTED` | Disconnected |
+| 0 | `MQTT_CONNECTED` | Connected |
+| 1 | `MQTT_CONNECT_BAD_PROTOCOL` | Bad protocol version |
+| 2 | `MQTT_CONNECT_BAD_CLIENT_ID` | Client ID rejected |
+| 3 | `MQTT_CONNECT_UNAVAILABLE` | Server unavailable |
+| 4 | `MQTT_CONNECT_BAD_CREDENTIALS` | Bad username/password |
+| 5 | `MQTT_CONNECT_UNAUTHORIZED` | Not authorized |
+
+## Examples
 
 | Example | Features | |
 |---------|----------|-|
@@ -182,21 +214,23 @@ AViShaMQTT(ssid, password, mqtt_server, mqtt_port, Client& net, mqtt_user = null
 | `MQTT_With_Authentication` | Username + password broker login | [View](examples/MQTT_With_Authentication) |
 | `MQTT_With_TLS` | Secure MQTT via WiFiClientSecure (port 8883) | [View](examples/MQTT_With_TLS) |
 | `Last_Will_And_Testament` | Will message + retained status publish | [View](examples/Last_Will_And_Testament) |
+| `Persistent_Session` | Persistent session + custom buffer size | [View](examples/Persistent_Session) |
+| `Streaming_Publish` | Large JSON payload via streaming publish | [View](examples/Streaming_Publish) |
 
-### Troubleshooting
+## Troubleshooting
 
-#### ESP32 reboots with `Brownout detector was triggered`
+### ESP32 reboots with `Brownout detector was triggered`
 
-This happens when the voltage drops below ~2.5V-2.7V, usually during WiFi TX power spikes.
+This happens when the voltage drops below ~2.5V–2.7V, usually during WiFi TX power spikes.
 
 **Fix your hardware first (best solution):**
 
 | Cause | Fix |
 |-------|-----|
-| USB cable too long / poor quality | Use a short 20-30cm USB cable with thick wires |
+| USB cable too long / poor quality | Use a short 20–30cm USB cable with thick wires |
 | USB port can't deliver enough current | Use a 5V 2A power adapter, not a PC USB port |
 | Voltage drop on breadboard jumper | Solder directly or use thicker wires |
-| No capacitor on VCC | Add 100µF-470µF electrolytic capacitor near VCC/GND |
+| No capacitor on VCC | Add 100µF–470µF electrolytic capacitor near VCC/GND |
 
 **Software workaround (last resort):**
 
@@ -206,9 +240,9 @@ Uncomment in `src/AViShaMQTT.h`:
 #define AVISHAMQTT_DISABLE_BROWNOUT
 ```
 
-⚠️ This disables ESP32 voltage protection. The chip may behave unpredictably if voltage drops too low. Only use temporarily.
+:warning: This disables ESP32 voltage protection. Only use temporarily.
 
-#### ESP keeps restarting (`rst:0xc (SW_CPU_RESET)`)
+### ESP keeps restarting (`rst:0xc (SW_CPU_RESET)`)
 
 | Code | Meaning | Fix |
 |------|---------|-----|
@@ -217,13 +251,13 @@ Uncomment in `src/AViShaMQTT.h`:
 | `rst:0x0b (TASK_WDT_RESET)` | Task watchdog timeout | Check `loop()` blocking |
 | `rst:0x10 (INT_WDT_RESET)` | Interrupt watchdog | Usually WiFi stack crash |
 
-#### `[MQTT]: Subscribe FAILED` / `[MQTT]: Publish FAILED`
+### `[MQTT]: Subscribe FAILED` / `[MQTT]: Publish FAILED`
 
 - WiFi or MQTT not connected → Check `mqtt.state()`
-- Topic too long (> 128 bytes by default) → Increase MQTT buffer via `MQTTClient` constructor
+- Topic too long (> 128 bytes by default) → Increase buffer via constructor: `AViShaMQTT(ssid, pass, server, 1883, user, pw, 512)`
 - Broker rejected the message → Check topic naming rules
 
-#### `[MQTT]: Connection denied (code: 1-5)`
+### `[MQTT]: Connection denied (code: 1-5)`
 
 | Code | Meaning | Fix |
 |------|---------|-----|
@@ -233,19 +267,19 @@ Uncomment in `src/AViShaMQTT.h`:
 | 4 | Bad credentials | Check username/password |
 | 5 | Not authorized | Check broker ACL settings |
 
-#### WiFi connects but MQTT fails
+### WiFi connects but MQTT fails
 
 - Is the broker reachable? Ping from PC first
 - Port 1883 (TCP) or 8883 (TLS)? Check firewall
 - For TLS: is `net.setInsecure()` called before `mqtt.begin()`?
 - Need a specific client ID? Use a custom one
 
-### Constructor Overloads
+## Credits
 
-```cpp
-// Default - uses internal WiFiClient
-AViShaMQTT(ssid, password, server, port = 1883, user = nullptr, pass = nullptr);
+AViShaMQTT uses **[arduino-mqtt](https://github.com/256dpi/arduino-mqtt)** (MIT License) by Joël Gähwiler as the MQTT protocol backend. Streaming publish and buffer configuration are inspired by **[PubSubClient](https://github.com/knolleary/pubsubclient)** by Nick O'Leary. See `LICENSE-mqtt.md` for license information.
 
-// Custom Client - for TLS (WiFiClientSecure), Ethernet, etc.
-AViShaMQTT(ssid, password, server, port, Client& net, user = nullptr, pass = nullptr);
-```
+---
+
+**Version:** 1.2.0 — **Author:** Ajang Rahmat — **Maintainer:** Ajang Rahmat <ajangrahmat@gmail.com>  
+**Category:** Communication — **License:** GPL-3.0 — **URL:** [GitHub — avisha95/AViShaMQTT](https://github.com/avisha95/AViShaMQTT)  
+**Architectures:** ESP8266, ESP32 — **Includes:** AViShaMQTT.h

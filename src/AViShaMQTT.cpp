@@ -1,20 +1,22 @@
 #include "AViShaMQTT.h"
 
 AViShaMQTT::AViShaMQTT(const char* ssid, const char* password, const char* mqtt_server,
-                 int mqtt_port, const char* mqtt_user, const char* mqtt_pass)
+                 int mqtt_port, const char* mqtt_user, const char* mqtt_pass,
+                 int bufferSize)
   : _ssid(ssid), _password(password), _mqtt_server(mqtt_server), _mqtt_port(mqtt_port),
     _mqtt_user(mqtt_user), _mqtt_pass(mqtt_pass), _net(&_internalNet),
-    _state(MQTT_DISCONNECTED), _lastReconnectTry(0) {
+    _client(bufferSize), _state(MQTT_DISCONNECTED), _lastReconnectTry(0) {
   for (int i = 0; i < AVISHAMQTT_MAX_SUBS; i++) {
     _subs[i].active = false;
   }
 }
 
 AViShaMQTT::AViShaMQTT(const char* ssid, const char* password, const char* mqtt_server,
-                 int mqtt_port, Client& net, const char* mqtt_user, const char* mqtt_pass)
+                 int mqtt_port, Client& net, const char* mqtt_user, const char* mqtt_pass,
+                 int bufferSize)
   : _ssid(ssid), _password(password), _mqtt_server(mqtt_server), _mqtt_port(mqtt_port),
     _mqtt_user(mqtt_user), _mqtt_pass(mqtt_pass), _net(&net),
-    _state(MQTT_DISCONNECTED), _lastReconnectTry(0) {
+    _client(bufferSize), _state(MQTT_DISCONNECTED), _lastReconnectTry(0) {
   for (int i = 0; i < AVISHAMQTT_MAX_SUBS; i++) {
     _subs[i].active = false;
   }
@@ -114,6 +116,58 @@ bool AViShaMQTT::publish(const char* topic, const uint8_t* payload, unsigned int
   return result;
 }
 
+bool AViShaMQTT::beginPublish(const char* topic, unsigned int size, bool retained, int qos) {
+  if (_streamBuf != nullptr) {
+    free(_streamBuf);
+  }
+  _streamBuf = (uint8_t*)malloc(size + 1);
+  if (_streamBuf == nullptr) {
+    Serial.println("[MQTT] >> STREAM ERROR: malloc failed (" + String(size) + " bytes)");
+    return false;
+  }
+  _streamSize = size;
+  _streamPos = 0;
+  _streamTopic = topic;
+  _streamRetained = retained;
+  _streamQos = qos;
+  Serial.println("[MQTT] >> STREAM begin Topic: " + String(topic) + ", Size: " + String(size));
+  return true;
+}
+
+size_t AViShaMQTT::write(uint8_t b) {
+  return write(&b, 1);
+}
+
+size_t AViShaMQTT::write(const uint8_t* buf, size_t size) {
+  if (_streamBuf == nullptr) return 0;
+  size_t room = _streamSize - _streamPos;
+  size_t n = (size < room) ? size : room;
+  memcpy(_streamBuf + _streamPos, buf, n);
+  _streamPos += n;
+  return n;
+}
+
+bool AViShaMQTT::endPublish() {
+  if (_streamBuf == nullptr) {
+    Serial.println("[MQTT] >> STREAM ERROR: no active stream");
+    return false;
+  }
+  _streamBuf[_streamPos] = '\0';
+  bool result = _client.publish(_streamTopic, (const char*)_streamBuf, (int)_streamPos, _streamRetained, _streamQos);
+  if (result) {
+    String ack = (_streamQos == 0) ? "Sent" : ((_streamQos == 1) ? "+PUBACK" : "+PUBCOMP");
+    Serial.println("[MQTT] >> PUB [QoS" + String(_streamQos) + "]" + String(_streamRetained ? " [R]" : "") + " " + ack + " Topic: " + String(_streamTopic) + ", " + String(_streamPos) + " bytes");
+  } else {
+    String fail = (_streamQos <= 0) ? "FAILED" : ((_streamQos == 1) ? "!PUBACK" : "!PUBCOMP");
+    Serial.println("[MQTT] >> PUB [QoS" + String(_streamQos) + "] " + fail + " Topic: " + String(_streamTopic));
+  }
+  free(_streamBuf);
+  _streamBuf = nullptr;
+  _streamSize = 0;
+  _streamPos = 0;
+  return result;
+}
+
 bool AViShaMQTT::subscribe(const char* topic) {
   return subscribe(topic, 0);
 }
@@ -183,6 +237,11 @@ void AViShaMQTT::clearWill() {
 
 void AViShaMQTT::setKeepAlive(int keepAlive) {
   _client.setKeepAlive(keepAlive);
+}
+
+void AViShaMQTT::setCleanSession(bool cleanSession) {
+  _client.setCleanSession(cleanSession);
+  Serial.println("[MQTT] Clean Session: " + String(cleanSession ? "true" : "false (persistent)"));
 }
 
 void AViShaMQTT::disconnect() {

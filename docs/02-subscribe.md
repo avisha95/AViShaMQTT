@@ -1,94 +1,126 @@
-# 02-Subscribe
-This is the doc for how to subscribe an MQTT Broker.
+---
+title: 02 — Subscribing to Topics
+description: Learn how to subscribe to MQTT topics and read incoming messages
+nav_order: 2
+---
 
-> [!Info]
-> Before you want to read this, read at least a little bit of `01-publish.md`, because there are all the basics this doc will set as basics.
+# 02 — Subscribing to Topics
 
-## Table of Content
-1. Instance an MQTT Obj
-2. subscribe into an topic
-3. get the latest message.
-4. Full example
+This tutorial covers how to subscribe to MQTT topics and process incoming messages.
 
-## 1. Instance an MQTT Object
-You need to instantiate an MQTT object from class AViShaMQTT.
+> **Prerequisite:** Read [01 — Publishing Data](01-publish) first for the basics.
 
-Use the same code as in chapter 1 from `01-publish.md`.
+## Table of Contents
 
-Here again if you need it:
+1. [Create the Object](#create-the-object)
+2. [Subscribe to a Topic](#subscribe-to-a-topic)
+3. [Get the Latest Message](#get-the-latest-message)
+4. [Full Example](#full-example)
 
-```cpp
-AViShaMQTT mqtt(ssid, password, mqtt_server, mqtt_port, mqtt_user_name, user_password);
-```
+---
 
-Where:
-- ssid: Your WiFi Name
-- password: Your WiFi password
-- mqtt_server: The IP or the url of the MQTT Broker
-- mqtt_port: the port of the server. (Mostly used: 1883)
+## Create the Object
 
-- mqtt_user_name: The broker gave you an username
-- user_pass: The broker gave you an password
-
-> [!Info]
-> For more information read `01-publish` Constructor.
-
-## 2. Subscribe a topic
-Use the method `subscribe`, which will subscribe to a topic you selected.
+Same as in the publish tutorial:
 
 ```cpp
-mqtt.subscribe("your/topic/here", 1);
+AViShaMQTT mqtt("wifi_name", "wifi_pass", "broker.emqx.io", 1883);
+mqtt.begin();
 ```
 
-> [!Notice]
-> The 1 is here because it is the priority of the topics.
->
-> That means that you can subscribe more than one!
+---
 
-## 3. Get The latest Message
-To get the freshest message use `getIncomingMessage`.
+## Subscribe to a Topic
+
+Use `subscribe()` to listen for messages on a topic:
 
 ```cpp
-String message = mqtt.getIncomingMessage();
+mqtt.subscribe("home/led/red");       // QoS 0
+mqtt.subscribe("home/led/green", 1);  // QoS 1
+mqtt.subscribe("home/led/blue", 2);   // QoS 2
 ```
 
-## 4. Full example
-```ino
+The QoS number determines delivery guarantees:
+- **0** — At most once (fire and forget)
+- **1** — At least once (acknowledged)
+- **2** — Exactly once (four-step handshake)
 
-// demo code, code could be broken
-// Copyright (C) 2026 seesee010
-// this snippet is under CC0 License
+You can subscribe to multiple topics — up to 8 by default.
 
+---
+
+## Get the Latest Message
+
+In `loop()`, use `getIncomingMessage()` and `getIncomingTopic()` to read messages:
+
+```cpp
+void loop() {
+  mqtt.loop();
+
+  String topic = mqtt.getIncomingTopic();
+  String message = mqtt.getIncomingMessage();
+
+  if (message != "") {
+    Serial.printf("Received [%s]: %s\n", topic.c_str(), message.c_str());
+
+    if (topic == "home/led/red") {
+      digitalWrite(LED_RED, message.toInt());
+    }
+
+    // Clear buffer to avoid re-processing
+    mqtt.setIncomingMessage("");
+    mqtt.setIncomingTopic("");
+  }
+}
+```
+
+> **Important:** Always clear the incoming message buffer with `setIncomingMessage("")` to avoid processing the same message repeatedly.
+
+---
+
+## Full Example
+
+```cpp
 #include <AViShaMQTT.h>
 
-const char* ssid = "isi dengan nama wifi";
-const char* password = "isi dengan password wifi";
+const char* ssid = "your wifi";
+const char* password = "your wifi password";
 const char* mqtt_server = "broker.emqx.io";
 
-const int mqtt_port = 1883;
-
-const char* mqtt_user = "user123";
-const char* mqtt_pass = "12345";
-
-// instiate object
-AViShaMQTT mqtt(ssid, password, mqtt_server, mqtt_port, mqtt_user, mqtt_pass);
-
-String message;
+AViShaMQTT mqtt(ssid, password, mqtt_server);
 
 void setup() {
-    mqtt.begin();
+  Serial.begin(115200);
+  pinMode(LED_BUILTIN, OUTPUT);
 
-    mqtt.subscribe("my/topic/here", 1);
+  if (!mqtt.begin()) {
+    Serial.print("Failed, state: ");
+    Serial.println(mqtt.state());
+    while (1);
+  }
+
+  mqtt.subscribe("home/led/builtin", 1);
 }
 
 void loop() {
-    mqtt.loop();
+  mqtt.loop();
 
-    message = mqtt.getIncomingMessage();
+  String topic = mqtt.getIncomingTopic();
+  String msg = mqtt.getIncomingMessage();
 
-    // ...do sth with the message...
+  if (msg != "") {
+    Serial.printf("RX [%s]: %s\n", topic.c_str(), msg.c_str());
+
+    if (topic == "home/led/builtin") {
+      digitalWrite(LED_BUILTIN, msg.toInt());
+    }
+
+    mqtt.setIncomingMessage("");
+    mqtt.setIncomingTopic("");
+  }
 }
 ```
 
-> [!Important]
-> Copyright (C) 2026 seesee010. This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**, same as the AViShaMQTT code.
+---
+
+[← Previous: 01 — Publishing](01-publish) | [Next: 03 — Advanced →](03-advanced)

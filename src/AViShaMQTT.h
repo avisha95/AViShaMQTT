@@ -35,9 +35,11 @@
 class AViShaMQTT {
   public:
     AViShaMQTT(const char* ssid, const char* password, const char* mqtt_server,
-            int mqtt_port = 1883, const char* mqtt_user = nullptr, const char* mqtt_pass = nullptr);
+            int mqtt_port = 1883, const char* mqtt_user = nullptr, const char* mqtt_pass = nullptr,
+            int bufferSize = 128);
     AViShaMQTT(const char* ssid, const char* password, const char* mqtt_server,
-            int mqtt_port, Client& net, const char* mqtt_user = nullptr, const char* mqtt_pass = nullptr);
+            int mqtt_port, Client& net, const char* mqtt_user = nullptr, const char* mqtt_pass = nullptr,
+            int bufferSize = 128);
 
     bool begin();
     void loop();
@@ -47,6 +49,10 @@ class AViShaMQTT {
     bool publish(String topic, String payload);
     bool publish(String topic, String payload, bool retained, int qos);
     bool publish(const char* topic, const uint8_t* payload, unsigned int length, bool retained = false, int qos = 0);
+    bool beginPublish(const char* topic, unsigned int size, bool retained = false, int qos = 0);
+    size_t write(const uint8_t* buf, size_t size);
+    size_t write(uint8_t b);
+    bool endPublish();
 
     bool subscribe(const char* topic);
     bool subscribe(const char* topic, int qos);
@@ -61,6 +67,7 @@ class AViShaMQTT {
     void clearWill();
 
     void setKeepAlive(int keepAlive);
+    void setCleanSession(bool cleanSession);
     void disconnect();
 
   private:
@@ -77,6 +84,13 @@ class AViShaMQTT {
     char _incomingMessage[100];
     int _state;
     unsigned long _lastReconnectTry;
+
+    uint8_t* _streamBuf = nullptr;
+    unsigned int _streamSize = 0;
+    unsigned int _streamPos = 0;
+    const char* _streamTopic = nullptr;
+    bool _streamRetained = false;
+    int _streamQos = 0;
 
     struct {
       char topic[64];

@@ -17,6 +17,8 @@ loop	KEYWORD2
 isConnected	KEYWORD2
 state	KEYWORD2
 publish	KEYWORD2
+beginPublish	KEYWORD2
+endPublish	KEYWORD2
 subscribe	KEYWORD2
 unsubscribe	KEYWORD2
 getIncomingTopic	KEYWORD2
@@ -26,6 +28,7 @@ setIncomingMessage	KEYWORD2
 setWill	KEYWORD2
 clearWill	KEYWORD2
 setKeepAlive	KEYWORD2
+setCleanSession	KEYWORD2
 disconnect	KEYWORD2
 
 #######################################
